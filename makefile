@@ -1,4 +1,4 @@
-CFLAGS=-Wall -Werror -pedantic -std=c99 -g
+CFLAGS=-Wall -Werror -Wextra -pedantic -std=c99 -g
 
 all: termdine jsonLoader
 
