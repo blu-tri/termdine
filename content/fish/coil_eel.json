@@ -1,0 +1,11 @@
+{
+	"name": "Coil Eel",
+	"size":
+	{
+		"min": 100,
+		"avg": 140,
+		"max": 180
+	},
+	"description": "A Coil Eel is a type of eel that kills its prey by coiling around it and restricting blood flow to its organs.",
+	"location": "Greenhill Lake"
+}

@@ -1,9 +1,27 @@
+#define TERMDINEDEBUG /* turn on debug mode */
+
 #include <stdio.h>
 #include <cjson/cJSON.h>
+#include <stdlib.h>
+#include "../include/termdine/log.h"
+
+/* type definitions */
+typedef struct fish 
+{
+	char* name;
+	int minSize;
+	int avgSize;
+	int maxSize;
+	char* location;
+	char* description;
+} Fish;
 
 /* function definitions */
 int hasStringValue(cJSON* object);
 int hasIntValue(cJSON* object);
+char* getStringValue(cJSON* object, char* ifNone);
+int getIntValue(cJSON* object, int ifNone);
+Fish loadFish(char* fishName);
 
 /* main function (crazy right?) */
 int main(int argc, char* argv[])
@@ -11,24 +29,41 @@ int main(int argc, char* argv[])
 	/* checking if program got inputted a possible file */
 	if (argc < 2)
 	{
-		printf("Not enough arguments! You should run this command as jsonLoader <filename>.\n");
+		prError("Not enough arguments! You should run this command as jsonLoader <fishname>.\n");
 		return 1;
 	}
 
-	FILE* jsonFile = fopen(argv[1], "r");
+	Fish dashil = loadFish("dashil");
+
+	printf("%s\n  size:\n    min: %d\n    avg: %d\n    max: %d\n  location: %s,  %s\n", dashil.name, dashil.minSize, dashil.avgSize, dashil.maxSize, dashil.location, dashil.description);
+
+	return 0;
+}
+
+Fish loadFish(char* fishName)
+{
+	Fish fish;
+
+	prInfo("loading fish: ");
+	printf("%s\n", fishName);
+
+	char* path = "content/fish/dashil.json";
+
+	FILE* jsonFile = fopen(path, "r");
 
 	/* checking if file exists */
 	if (jsonFile == NULL) 
 	{
-		printf("Couldn't open file %s, does this file actually exist?\n", argv[1]);
-		return 1;
+		prError("Couldn't open file does the following file actually exist?\n");
+		prError(path);
+		exit(1);
 	}
 
 	/* reading and closing file */
 	char jsonFileContent[4096];
 	fread(jsonFileContent, 1, sizeof(jsonFileContent), jsonFile);
 	fclose(jsonFile);
-
+ 
 	/* check if can parse into json */
 	cJSON* json = cJSON_Parse(jsonFileContent);
 	if (json == NULL)
@@ -39,18 +74,30 @@ int main(int argc, char* argv[])
 			printf("Couldn't parse file into json\n%s\n", error);
 		}
 		cJSON_Delete(json);
-		return 1;
+		exit(1);
 	}
 
-	/* print json values */
-	cJSON* name = cJSON_GetObjectItemCaseSensitive(json, "name");
-	if (hasStringValue(name))
-	{
-		printf("fish name: %s\n", name->valuestring);
-	}
+	/* get json values */
+	cJSON* name        = cJSON_GetObjectItemCaseSensitive(json,        "name");
+	cJSON* location    = cJSON_GetObjectItemCaseSensitive(json,    "location");
+	cJSON* description = cJSON_GetObjectItemCaseSensitive(json, "description");
+
+	cJSON* size    = cJSON_GetObjectItemCaseSensitive(json, "size");
+	cJSON* minsize = cJSON_GetObjectItemCaseSensitive(size,  "min");
+	cJSON* avgsize = cJSON_GetObjectItemCaseSensitive(size,  "avg");
+	cJSON* maxsize = cJSON_GetObjectItemCaseSensitive(size,  "max");
+
+	fish.name        = getStringValue(name,        "???");
+	fish.location    = getStringValue(location,    "???");
+	fish.description = getStringValue(description, "???");
+
+	fish.minSize = getIntValue(minsize, 0);
+	fish.avgSize = getIntValue(avgsize, 0);
+	fish.maxSize = getIntValue(maxsize, 0);
 
 	cJSON_Delete(json);
-	return 0;
+
+	return fish;
 }
 
 /* function implementations */
@@ -63,3 +110,15 @@ int hasIntValue(cJSON* object)
 {
 	return (cJSON_IsNumber(object));	
 }
+
+char* getStringValue(cJSON* object, char* ifNone)
+{
+	return (hasStringValue(object) ? object->valuestring : ifNone);
+}
+
+int getIntValue(cJSON* object, int ifNone)
+{
+	return (hasIntValue(object) ? object->valueint : ifNone);
+}
+
+
