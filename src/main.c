@@ -5,28 +5,43 @@ WINDOW* mainWin;
 int main()
 {
 	int c;
+	int i;
 	int running = TRUE;
 
-
 	initscr();
+	nodelay(stdscr, TRUE);
 	raw();
-	keypad(mainWin, TRUE);
+	keypad(stdscr, TRUE);
 	noecho();
-	nodelay(mainWin, TRUE);
+	
 	curs_set(0);
 
 	mainWin = newwin(9, 16, 0, 0);
 	box(mainWin, 0, 0);
 
 
-	while (running == TRUE)
+	while (running)
 	{
+		wrefresh(mainWin);
+		refresh();
 		c = wgetch(mainWin);
+		
+		/* input
+		switch (c)
+		{
+			case 'c':
+				mvprintw(0, 1, "test");
+		}*/
 
+		/* drawing */
+		mvprintw(0, 1, "test");
+		mvwprintw(mainWin, 1, 1, "%d", i);
+		box(mainWin, 0, 0);
+		
 		if (c == 'q' || c == 27) 
 			running = FALSE;
+		i++;
 	}
 
-	wrefresh(mainWin);
 	endwin();
 }
