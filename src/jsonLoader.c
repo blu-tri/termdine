@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-	Fish dashil = loadFish("dashil");
+	Fish dashil = loadFish(argv[1]);
 
 	printf("%s\n  size:\n    min: %d\n    avg: %d\n    max: %d\n  location: %s,\n%s\n", dashil.name, dashil.minSize, dashil.avgSize, dashil.maxSize, dashil.location, dashil.description);
 
