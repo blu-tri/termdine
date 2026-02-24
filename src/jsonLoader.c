@@ -1,3 +1,4 @@
+#include <string.h>
 #define TERMDINEDEBUG /* turn on debug mode */
 
 #include <stdio.h>
@@ -8,12 +9,12 @@
 /* type definitions */
 typedef struct fish 
 {
-	char* name;
+	char name[24];
 	int minSize;
 	int avgSize;
 	int maxSize;
-	char* location;
-	char* description;
+	char location[48];
+	char description[256];
 } Fish;
 
 /* function definitions */
@@ -35,7 +36,7 @@ int main(int argc, char* argv[])
 
 	Fish dashil = loadFish("dashil");
 
-	printf("%s\n  size:\n    min: %d\n    avg: %d\n    max: %d\n  location: %s,  %s\n", dashil.name, dashil.minSize, dashil.avgSize, dashil.maxSize, dashil.location, dashil.description);
+	printf("%s\n  size:\n    min: %d\n    avg: %d\n    max: %d\n  location: %s,\n%s\n", dashil.name, dashil.minSize, dashil.avgSize, dashil.maxSize, dashil.location, dashil.description);
 
 	return 0;
 }
@@ -60,7 +61,7 @@ Fish loadFish(char* fishName)
 	}
 
 	/* reading and closing file */
-	char jsonFileContent[4096];
+	char jsonFileContent[8192];
 	fread(jsonFileContent, 1, sizeof(jsonFileContent), jsonFile);
 	fclose(jsonFile);
  
@@ -87,9 +88,15 @@ Fish loadFish(char* fishName)
 	cJSON* avgsize = cJSON_GetObjectItemCaseSensitive(size,  "avg");
 	cJSON* maxsize = cJSON_GetObjectItemCaseSensitive(size,  "max");
 
-	fish.name        = getStringValue(name,        "???");
-	fish.location    = getStringValue(location,    "???");
-	fish.description = getStringValue(description, "???");
+	char* nameValue        = getStringValue(name,        "???");
+	char* locationValue    = getStringValue(location,    "???");
+	char* descriptionValue = getStringValue(description, "???");
+	
+	/* NOTE: i have no clue if this is actually safe to do, probably not */
+	memcpy(fish.name,        nameValue,         sizeof(char)*24);
+	memcpy(fish.location,    locationValue,     sizeof(char)*48);
+	memcpy(fish.description, descriptionValue, sizeof(char)*256);
+
 
 	fish.minSize = getIntValue(minsize, 0);
 	fish.avgSize = getIntValue(avgsize, 0);
