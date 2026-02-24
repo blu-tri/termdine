@@ -2,10 +2,10 @@
 
 WINDOW* mainWin;
 
-int main()
+int main(void)
 {
 	int c;
-	int i;
+	int i=0;
 	int running = TRUE;
 
 	initscr();
@@ -44,4 +44,6 @@ int main()
 	}
 
 	endwin();
+
+	return 0;
 }

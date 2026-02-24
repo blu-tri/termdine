@@ -1,0 +1,10 @@
+{
+	"name": "Dashil",
+	"size":
+	{
+		"min": 7,
+		"avg": 10,
+		"max": 13
+	},
+	"description": "A Dashil is a tadpole-like fish that dashes around the water with its fin."
+}
