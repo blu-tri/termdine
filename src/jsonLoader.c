@@ -1,6 +1,7 @@
-#include <string.h>
 #define TERMDINEDEBUG /* turn on debug mode */
 
+#include <ctype.h>
+#include <string.h>
 #include <stdio.h>
 #include <cjson/cJSON.h>
 #include <stdlib.h>
@@ -22,6 +23,7 @@ int hasStringValue(cJSON* object);
 int hasIntValue(cJSON* object);
 char* getStringValue(cJSON* object, char* ifNone);
 int getIntValue(cJSON* object, int ifNone);
+char* convertToFilename(char* name);
 Fish loadFish(char* fishName);
 
 /* main function (crazy right?) */
@@ -46,7 +48,7 @@ Fish loadFish(char* fishName)
 	Fish fish;
 
 	prInfo("loading fish: ");
-	printf("%s\n", fishName);
+	printf("%s\n", convertToFilename(fishName));
 
 	char* path = "content/fish/dashil.json";
 
@@ -128,4 +130,16 @@ int getIntValue(cJSON* object, int ifNone)
 	return (hasIntValue(object) ? object->valueint : ifNone);
 }
 
+char* convertToFilename(char* name)
+{
+	char* filename = name;
 
+	for (int i=0;filename[i]!='\0';i++)
+	{
+		filename[i] = tolower(filename[i]);
+		if (filename[i]==' ')
+			filename[i] = '_';
+	}
+
+	return filename;
+}
