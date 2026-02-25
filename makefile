@@ -13,6 +13,9 @@ log: src/log.c include/termdine/log.h
 	clang -c src/log.c -o lib/log.o $(CFLAGS)
 	ar rcs lib/liblog.a lib/log.o
 
+math: src/math.c
+	clang src/math.c -o math -lm $(CFLAGS)
+
 clean:
-	rm -rf termdine lib/*
+	rm -rf termdine math lib/*
 
