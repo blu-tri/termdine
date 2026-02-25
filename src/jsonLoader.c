@@ -7,23 +7,27 @@
 #include <stdlib.h>
 #include "../include/termdine/log.h"
 
+#define MAXNAMESIZE   24 /*  */
+#define MAXDESCSIZE  256 /*  */
+#define MAXFISHAMOUNT 20 /*  */
+
 /* type definitions */
 typedef struct fish 
 {
-	char name[24];
+	char name[MAXNAMESIZE];
 	int minSize;
 	int avgSize;
 	int maxSize;
-	char location[48];
-	char description[256];
+	char location[MAXNAMESIZE];
+	char description[MAXDESCSIZE];
 } Fish;
 
 typedef struct location
 {
-	char name[24];
-	char fish[20][24];
+	char name[MAXNAMESIZE];
+	char fish[MAXFISHAMOUNT][MAXDESCSIZE];
 	int fishAmount;
-	char description[256];
+	char description[MAXDESCSIZE];
 } Location;
 
 /* function definitions */
