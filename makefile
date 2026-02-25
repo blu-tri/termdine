@@ -1,6 +1,6 @@
 CFLAGS := -Wall -Werror -Wextra -pedantic -std=c99 -g
 
-all: jsonLoader termdine log
+all: jsonLoader log termdine
 
 termdine: src/main.c
 	clang src/main.c src/jsonLoader.c -o termdine  -lcjson -Llib -ljsonLoader -llog -lncurses $(CFLAGS)
