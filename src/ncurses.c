@@ -1,18 +1,20 @@
+#define _GNU_SOURCE
 #include <ncurses.h>
+#include <time.h>
 
 WINDOW* mainWin;
 
 int main(void)
 {
-	int c;
-	int i=0;
+	int c,i,j=0;
 	int running = TRUE;
 
 	initscr();
-	nodelay(stdscr, TRUE);
 	raw();
-	keypad(stdscr, TRUE);
 	noecho();
+	
+	keypad(stdscr, TRUE);
+	nodelay(stdscr, TRUE);
 	
 	curs_set(0);
 
@@ -24,23 +26,29 @@ int main(void)
 	{
 		wrefresh(mainWin);
 		refresh();
-		c = wgetch(mainWin);
+		c = getch();
 		
-		/* input
-		switch (c)
-		{
-			case 'c':
-				mvprintw(0, 1, "test");
-		}*/
+		/* input */
+		if (c != ERR) {
+			switch (c)
+			{
+				case 'a': j+=1; break; 
+			}
+
+			if (c == 'q' || c == 27) 
+				running = FALSE;
+		}
 
 		/* drawing */
 		mvprintw(0, 1, "test");
 		mvwprintw(mainWin, 1, 1, "%d", i);
 		box(mainWin, 0, 0);
-		
-		if (c == 'q' || c == 27) 
-			running = FALSE;
+
+		struct timespec time = {0, 750000};
+		nanosleep(&time, NULL);
+
 		i++;
+
 	}
 
 	endwin();
