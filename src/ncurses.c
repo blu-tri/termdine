@@ -6,7 +6,9 @@ WINDOW* mainWin;
 
 int main(void)
 {
-	int c,i,j=0;
+	int c=0;
+	int i=0;
+	int j=0;
 	int running = TRUE;
 
 	initscr();
@@ -42,6 +44,7 @@ int main(void)
 		/* drawing */
 		mvprintw(0, 1, "test");
 		mvwprintw(mainWin, 1, 1, "%d", i);
+		mvwprintw(mainWin, 2, 1, "%d", j);
 		box(mainWin, 0, 0);
 
 		struct timespec time = {0, 750000};
