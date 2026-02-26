@@ -1,6 +1,4 @@
-#define _GNU_SOURCE
 #include <ncurses.h>
-#include <time.h>
 
 WINDOW* mainWin;
 
@@ -16,13 +14,11 @@ int main(void)
 	noecho();
 	
 	keypad(stdscr, TRUE);
-	nodelay(stdscr, TRUE);
+	timeout(10);
 	
 	curs_set(0);
 
 	mainWin = newwin(9, 16, 0, 0);
-	box(mainWin, 0, 0);
-
 
 	while (running)
 	{
@@ -42,13 +38,12 @@ int main(void)
 		}
 
 		/* drawing */
-		mvprintw(0, 1, "test");
 		mvwprintw(mainWin, 1, 1, "%d", i);
 		mvwprintw(mainWin, 2, 1, "%d", j);
-		box(mainWin, 0, 0);
 
-		struct timespec time = {0, 750000};
-		nanosleep(&time, NULL);
+
+		mvprintw(0, 1, "test");
+		box(mainWin, 0, 0);
 
 		i++;
 
