@@ -49,6 +49,7 @@ void doButtonAction(App* app, Button button);
 App initApp(void);
 
 WINDOW* mainWin;
+WINDOW* textWin;
 
 int main(void)
 {
@@ -66,6 +67,7 @@ int main(void)
 	curs_set(0);
 
 	mainWin = newwin(HEIGHT, WIDTH, 0, 0);
+	textWin = newwin(HEIGHT-2, WIDTH-2, 1, 1);
 
 	/* menu init */
 	Button doNothingButton = createButton("do nothing", NOTHING, 0);
@@ -110,7 +112,9 @@ int main(void)
 	while (termdine.running)
 	{
 		wrefresh(mainWin);
+		wrefresh(textWin);
 		refresh();
+
 		c = getch();
 		
 		/* input */
@@ -140,7 +144,7 @@ int main(void)
 
 		/* drawing */
 		mvprintw(0, 1, "%s", menus[termdine.selectedMenu].title);
-		mvaddstr(1, 1,  menus[termdine.selectedMenu].text);
+		mvwaddstr(textWin, 0, 0, menus[termdine.selectedMenu].text);
 		
 		for (int i=0;i<menus[termdine.selectedMenu].buttonAmount;i++)
 		{
