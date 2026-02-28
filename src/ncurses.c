@@ -94,7 +94,7 @@ int main(void)
 				case 'w': termdine.selectedButton -= 1; break;
 				case 's': termdine.selectedButton += 1; break;
 				case 'e': doButtonAction(&termdine, menus[termdine.selectedMenu].buttons[termdine.selectedButton]); break; 
-				case KEY_ENTER: doButtonAction(&termdine, menus[termdine.selectedMenu].buttons[termdine.selectedButton]); break; 
+				case 10: doButtonAction(&termdine, menus[termdine.selectedMenu].buttons[termdine.selectedButton]); break; 
 			}
 
 			if (c == 'q' || c == 27) 
