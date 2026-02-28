@@ -15,7 +15,6 @@ typedef struct fish
 	int minSize;
 	int avgSize;
 	int maxSize;
-	char location[MAXNAMESIZE];
 	char description[MAXDESCSIZE];
 } Fish;
 

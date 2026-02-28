@@ -50,7 +50,6 @@ Fish loadFish(char* fishName)
 
 	/* get json values */
 	cJSON* name        = cJSON_GetObjectItemCaseSensitive(json,        "name");
-	cJSON* location    = cJSON_GetObjectItemCaseSensitive(json,    "location");
 	cJSON* description = cJSON_GetObjectItemCaseSensitive(json, "description");
 
 	cJSON* size    = cJSON_GetObjectItemCaseSensitive(json, "size");
@@ -59,12 +58,10 @@ Fish loadFish(char* fishName)
 	cJSON* maxsize = cJSON_GetObjectItemCaseSensitive(size,  "max");
 
 	char* nameValue        = getStringValue(name,        "???");
-	char* locationValue    = getStringValue(location,    "???");
 	char* descriptionValue = getStringValue(description, "???");
 	
 	/* NOTE: i have no clue if this is actually safe to do, probably not */
 	memcpy(fish.name,        nameValue,         24);
-	memcpy(fish.location,    locationValue,     48);
 	memcpy(fish.description, descriptionValue, 256);
 
 

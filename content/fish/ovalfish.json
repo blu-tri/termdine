@@ -1,0 +1,10 @@
+{
+	"name": "Ovalfish",
+	"size":
+	{
+		"min": 20,
+		"avg": 26,
+		"max": 33
+	},
+	"description": "An Ovalfish is a type of ray that is very flat that likes to ride the waves of beaches."
+}
