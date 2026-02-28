@@ -1,21 +1,21 @@
 # termdine
 terminal fishing game that i made up idk
 
-# base game content
-## locations
-Greenhill Lake
-Pinewood Creek
-Blackbeak Beach
+#### base game
+Locations
+ - Greenhill Lake
+ - Pinewood Creek
+ - Blackbeak Beach
 
-## fish
-Dashil   (Greenhill Lake)
-Coil Eel (Greenhill Lake, Pinewood Creek)
-Ovalfish (Pinewood Creek)
+Fish
+ - Dashil   (Greenhill Lake)
+ - Coil Eel (Greenhill Lake, Pinewood Creek)
+ - Ovalfish (Pinewood Creek)
 
-# Peltylyzysygymynylyxis (no clue how to pronounce) Sea expansion content
-## locations
-Boreal Reefs
+#### Peltylyzysygymynylyxis (no clue how to pronounce) Sea expansion
+Locations
+ - Boreal Reefs
 
-## fish
-Dorian (Boreal Reefs)
-Nemian (Boreal Reefs)
+Fish
+ - Dorian (Boreal Reefs)
+ - Nemian (Boreal Reefs)
