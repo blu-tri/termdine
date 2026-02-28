@@ -3,13 +3,25 @@
 
 #define MAXTITLESIZE 14
 #define MAXNAMESIZE  10
+
+#define MAXMENUS 5
+
 #define WIDTH 16
 #define HEIGHT 9
 
 /* type definitions */
+typedef enum action
+{
+	QUIT,
+	GOTOMENU,
+	NOTHING,
+} Action;
+
 typedef struct button 
 {
 	char name[MAXNAMESIZE];
+	Action action;
+	int actionInput;
 } Button;
 
 typedef struct menu 
@@ -19,9 +31,18 @@ typedef struct menu
 	Button* buttons;
 } Menu;
 
+typedef struct app
+{
+	int running;
+	int selectedMenu;
+	int selectedButton;
+} App;
+
 /* function definitions */
 Menu createMenu(char* title, int buttonAmount, Button* buttons);
-Button createButton(char* name);
+Button createButton(char* name, Action action, int actionInput);
+void doButtonAction(App* app, Button button);
+App initApp(void);
 
 WINDOW* mainWin;
 
@@ -29,9 +50,7 @@ int main(void)
 {
 	/* ncurses init */
 	int c = 0;
-	int selectedMenu   = 0;
-	int selectedButton = 0;
-	int running = TRUE;
+	App termdine = initApp();
 
 	initscr();
 	raw();
@@ -45,12 +64,14 @@ int main(void)
 	mainWin = newwin(9, 16, 0, 0);
 
 	/* menu init */
-	Button testButton = createButton("test");
+	Button testButton = createButton("test", NOTHING, 0);
+	Button quitButton = createButton("quit", QUIT, 0);
+
 
 	Button mainMenuButtons[3];
 	mainMenuButtons[0] = testButton;
 	mainMenuButtons[1] = testButton;
-	mainMenuButtons[2] = testButton;
+	mainMenuButtons[2] = quitButton;
 
 	Menu mainMenu = createMenu("Termdine", 3, mainMenuButtons);
 
@@ -58,7 +79,7 @@ int main(void)
 
 	menus[0] = mainMenu;
 
-	while (running)
+	while (termdine.running)
 	{
 		wrefresh(mainWin);
 		refresh();
@@ -68,30 +89,32 @@ int main(void)
 		if (c != ERR) {
 			switch (c)
 			{
-				case KEY_UP: selectedButton -= 1; break;
-				case KEY_DOWN: selectedButton += 1; break;
-				case 'w': selectedButton -= 1; break;
-				case 's': selectedButton += 1; break;
+				case KEY_UP: termdine.selectedButton -= 1; break;
+				case KEY_DOWN: termdine.selectedButton += 1; break;
+				case 'w': termdine.selectedButton -= 1; break;
+				case 's': termdine.selectedButton += 1; break;
+				case 'e': doButtonAction(&termdine, menus[termdine.selectedMenu].buttons[termdine.selectedButton]); break; 
+				case KEY_ENTER: doButtonAction(&termdine, menus[termdine.selectedMenu].buttons[termdine.selectedButton]); break; 
 			}
 
 			if (c == 'q' || c == 27) 
-				running = FALSE;
+				termdine.running = FALSE;
 		}
 
 		/* logic */
-		while (selectedButton<0||selectedButton>menus[selectedMenu].buttonAmount-1)
+		while (termdine.selectedButton<0||termdine.selectedButton>menus[termdine.selectedMenu].buttonAmount-1)
 		{
-			if (selectedButton<0)
-				selectedButton += menus[selectedMenu].buttonAmount;
-			if (selectedButton>menus[selectedMenu].buttonAmount-1)
-				selectedButton -= menus[selectedMenu].buttonAmount;
+			if (termdine.selectedButton<0)
+				termdine.selectedButton += menus[termdine.selectedMenu].buttonAmount;
+			if (termdine.selectedButton>menus[termdine.selectedMenu].buttonAmount-1)
+				termdine.selectedButton -= menus[termdine.selectedMenu].buttonAmount;
 		}
 
 		/* drawing */
-		mvprintw(0, 1, "%s", menus[selectedMenu].title);
-		for (int i=0;i<menus[selectedMenu].buttonAmount;i++)
+		mvprintw(0, 1, "%s", menus[termdine.selectedMenu].title);
+		for (int i=0;i<menus[termdine.selectedMenu].buttonAmount;i++)
 		{
-			mvprintw(i+1, 1, "%s%s", (selectedButton==i ? "> " : ""), menus[selectedMenu].buttons[selectedButton].name);
+			mvprintw(i+1, 1, "%s%s", (termdine.selectedButton==i ? "> " : ""), menus[termdine.selectedMenu].buttons[i].name);
 		}
 		box(mainWin, 0, 0);
 	}
@@ -113,11 +136,35 @@ Menu createMenu(char* title, int buttonAmount, Button* buttons)
 	return menu;
 }
 
-Button createButton(char* name)
+Button createButton(char* name, Action action, int actionInput)
 {
 	Button button;
+
+	button.action = action;
+	button.actionInput = actionInput;
 
 	memcpy(button.name, name, MAXNAMESIZE);
 
 	return button;
+}
+
+void doButtonAction(App* app, Button button)
+{
+	switch(button.action)
+	{
+		case QUIT: app->running = FALSE; break;
+		case GOTOMENU: app->selectedMenu = button.actionInput; break;
+		case NOTHING: break;
+	}
+}
+
+App initApp(void)
+{
+	App app;
+
+	app.running = TRUE;
+	app.selectedMenu = 0;
+	app.selectedButton = 0;
+
+	return app;
 }
