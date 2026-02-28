@@ -3,6 +3,7 @@
 
 #define MAXTITLESIZE 14
 #define MAXNAMESIZE  10
+#define MAXTEXTSIZE  40
 
 #define MAXMENUS 5
 
@@ -27,6 +28,7 @@ typedef struct button
 typedef struct menu 
 {
 	char title[MAXTITLESIZE];
+	char text[MAXTEXTSIZE];
 	int buttonAmount;
 	Button* buttons;
 } Menu;
@@ -40,6 +42,7 @@ typedef struct app
 
 /* function definitions */
 Menu createMenu(char* title, int buttonAmount, Button* buttons);
+Menu createMenuWithText(char* title, int buttonAmount, Button* buttons, char* text);
 Button createButton(char* name, Action action, int actionInput);
 void doButtonAction(App* app, Button button);
 App initApp(void);
@@ -64,20 +67,44 @@ int main(void)
 	mainWin = newwin(9, 16, 0, 0);
 
 	/* menu init */
-	Button testButton = createButton("test", NOTHING, 0);
+	Button doNothingButton = createButton("do nothing", NOTHING, 0);
+
+	Button fishButton = createButton("fish", GOTOMENU, 1);
+	Button textButton = createButton("go to text", GOTOMENU, 3);
+	Button settingsButton = createButton("settings", GOTOMENU, 2);
+	Button backButton = createButton("back", GOTOMENU, 0);
+	Button fishBackButton = createButton("back", GOTOMENU, 1);
+
 	Button quitButton = createButton("quit", QUIT, 0);
 
 
 	Button mainMenuButtons[3];
-	mainMenuButtons[0] = testButton;
-	mainMenuButtons[1] = testButton;
+	mainMenuButtons[0] = fishButton;
+	mainMenuButtons[1] = settingsButton;
 	mainMenuButtons[2] = quitButton;
 
-	Menu mainMenu = createMenu("Termdine", 3, mainMenuButtons);
+	Button fishButtons[2];
+	fishButtons[0] = textButton;
+	fishButtons[1] = backButton;
 
-	Menu menus[1];
+	Button settingsButtons[2];
+	settingsButtons[0] = doNothingButton;
+	settingsButtons[1] = backButton;
+
+	Button textButtons[1];
+	textButtons[0] = fishBackButton;
+
+	Menu mainMenu = createMenu("Termdine", 3, mainMenuButtons);
+	Menu settingsMenu = createMenu("Settings", 2, settingsButtons);
+	Menu fishMenu = createMenu("Fish", 2, fishButtons);
+	Menu textMenu = createMenuWithText("Text", 1, textButtons, "this is a test to see how well this works");
+
+	Menu menus[4];
 
 	menus[0] = mainMenu;
+	menus[1] = fishMenu;
+	menus[2] = settingsMenu;
+	menus[3] = textMenu;
 
 	while (termdine.running)
 	{
@@ -112,9 +139,13 @@ int main(void)
 
 		/* drawing */
 		mvprintw(0, 1, "%s", menus[termdine.selectedMenu].title);
+		mvaddstr(1, 1,  menus[termdine.selectedMenu].text);
+		
 		for (int i=0;i<menus[termdine.selectedMenu].buttonAmount;i++)
 		{
-			mvprintw(i+1, 1, "%s%s", (termdine.selectedButton==i ? "> " : ""), menus[termdine.selectedMenu].buttons[i].name);
+			
+			mvprintw(i+(strlen(menus[termdine.selectedMenu].text)/14)+1, 1, "%s%s", (termdine.selectedButton==i ? "> " : ""), menus[termdine.selectedMenu].buttons[i].name);
+
 		}
 		box(mainWin, 0, 0);
 	}
@@ -132,6 +163,20 @@ Menu createMenu(char* title, int buttonAmount, Button* buttons)
 	menu.buttons = buttons;
 
 	memcpy(menu.title, title, MAXTITLESIZE);
+	memcpy(menu.text, "", 1);
+
+	return menu;
+}
+
+Menu createMenuWithText(char* title, int buttonAmount, Button* buttons, char* text)
+{
+	Menu menu;
+
+	menu.buttonAmount = buttonAmount;
+	menu.buttons = buttons;
+
+	memcpy(menu.title, title, MAXTITLESIZE);
+	memcpy(menu.text, text, MAXTEXTSIZE);
 
 	return menu;
 }
