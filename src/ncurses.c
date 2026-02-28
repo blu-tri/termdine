@@ -1,14 +1,15 @@
 #include <ncurses.h>
 #include <string.h>
 
-#define MAXTITLESIZE 14
-#define MAXNAMESIZE  10
 #define MAXTEXTSIZE  40
 
 #define MAXMENUS 5
 
-#define WIDTH 16
+#define WIDTH 32
 #define HEIGHT 9
+
+#define MAXTITLESIZE WIDTH-2
+#define MAXNAMESIZE  WIDTH-4
 
 /* type definitions */
 typedef enum action
@@ -64,7 +65,7 @@ int main(void)
 	
 	curs_set(0);
 
-	mainWin = newwin(9, 16, 0, 0);
+	mainWin = newwin(HEIGHT, WIDTH, 0, 0);
 
 	/* menu init */
 	Button doNothingButton = createButton("do nothing", NOTHING, 0);
