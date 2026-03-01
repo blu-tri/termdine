@@ -17,7 +17,7 @@ math: src/math.c
 	clang src/math.c -o math -lm $(CFLAGS)
 
 ncurses: src/ncurses.c 
-	clang src/ncurses.c -o ncurses -lncurses $(CFLAGS)
+	clang src/ncurses.c -o ncurses -lncurses -lm $(CFLAGS)
 
 clean:
 	rm -rf termdine math ncurses lib/*

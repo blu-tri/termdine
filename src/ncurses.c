@@ -1,7 +1,8 @@
+#include <math.h>
 #include <ncurses.h>
 #include <string.h>
 
-#define MAXTEXTSIZE  40
+#define MAXTEXTSIZE 100
 
 #define MAXMENUS 5
 
@@ -16,6 +17,8 @@ typedef enum action
 {
 	QUIT,
 	GOTOMENU,
+	CHANGETEXT,
+	CHANGECURRENTTEXT,
 	NOTHING,
 } Action;
 
@@ -23,7 +26,7 @@ typedef struct button
 {
 	char name[MAXNAMESIZE];
 	Action action;
-	int actionInput;
+	char actionInput[MAXTEXTSIZE+2];
 } Button;
 
 typedef struct menu 
@@ -39,14 +42,18 @@ typedef struct app
 	int running;
 	int selectedMenu;
 	int selectedButton;
+	Menu* menus;
 } App;
 
 /* function definitions */
 Menu createMenu(char* title, int buttonAmount, Button* buttons);
 Menu createMenuWithText(char* title, int buttonAmount, Button* buttons, char* text);
-Button createButton(char* name, Action action, int actionInput);
+Button createButton(char* name, Action action, char* actionInput);
 void doButtonAction(App* app, Button button);
 App initApp(void);
+void changeText(Menu* menu, char* newText, int amount);
+void addButton(Menu* menu, Button button, int index);
+void removeButton(Menu* menu, int index);
 
 WINDOW* mainWin;
 WINDOW* textWin;
@@ -62,7 +69,7 @@ int main(void)
 	noecho();
 	
 	keypad(stdscr, TRUE);
-	timeout(10);
+	timeout(15);
 	
 	curs_set(0);
 
@@ -70,15 +77,16 @@ int main(void)
 	textWin = newwin(HEIGHT-2, WIDTH-2, 1, 1);
 
 	/* menu init */
-	Button doNothingButton = createButton("do nothing", NOTHING, 0);
+	Button doNothingButton = createButton("do nothing", NOTHING, "");
 
-	Button fishButton = createButton("fish", GOTOMENU, 1);
-	Button textButton = createButton("go to text", GOTOMENU, 3);
-	Button settingsButton = createButton("settings", GOTOMENU, 2);
-	Button backButton = createButton("back", GOTOMENU, 0);
-	Button fishBackButton = createButton("back", GOTOMENU, 1);
-
-	Button quitButton = createButton("quit", QUIT, 0);
+	Button fishButton = createButton("fish", GOTOMENU, "1");
+	Button textButton = createButton("go to text", GOTOMENU, "3");
+	Button settingsButton = createButton("settings", GOTOMENU, "2");
+	Button backButton = createButton("back", GOTOMENU, "0");
+	Button fishBackButton = createButton("back", GOTOMENU, "1");
+	Button sayHiButton = createButton("hello", CHANGECURRENTTEXT, "2Hi");
+		Button setToHelloButton = createButton("set text to Hello", CHANGETEXT, "35Hello");
+	Button quitButton = createButton("quit", QUIT, "");
 
 
 	Button mainMenuButtons[3];
@@ -90,17 +98,19 @@ int main(void)
 	fishButtons[0] = textButton;
 	fishButtons[1] = backButton;
 
-	Button settingsButtons[2];
+	Button settingsButtons[3];
 	settingsButtons[0] = doNothingButton;
-	settingsButtons[1] = backButton;
+	settingsButtons[1] = setToHelloButton;
+	settingsButtons[2] = backButton;
 
-	Button textButtons[1];
-	textButtons[0] = fishBackButton;
+	Button textButtons[2];
+	textButtons[0] = sayHiButton;
+	textButtons[1] = fishBackButton;
 
 	Menu mainMenu = createMenu("Termdine", 3, mainMenuButtons);
-	Menu settingsMenu = createMenu("Settings", 2, settingsButtons);
+	Menu settingsMenu = createMenu("Settings", 3, settingsButtons);
 	Menu fishMenu = createMenu("Fish", 2, fishButtons);
-	Menu textMenu = createMenuWithText("Text", 1, textButtons, "this is a test to see how well this works");
+	Menu textMenu = createMenuWithText("Text", 2, textButtons, "this is a test to see how well this works");
 
 	Menu menus[4];
 
@@ -108,6 +118,8 @@ int main(void)
 	menus[1] = fishMenu;
 	menus[2] = settingsMenu;
 	menus[3] = textMenu;
+
+	termdine.menus = menus;
 
 	while (termdine.running)
 	{
@@ -125,8 +137,8 @@ int main(void)
 				case KEY_DOWN: termdine.selectedButton += 1; break;
 				case 'w': termdine.selectedButton -= 1; break;
 				case 's': termdine.selectedButton += 1; break;
-				case 'e': doButtonAction(&termdine, menus[termdine.selectedMenu].buttons[termdine.selectedButton]); break; 
-				case 10: doButtonAction(&termdine, menus[termdine.selectedMenu].buttons[termdine.selectedButton]); break; 
+				case 'e': doButtonAction(&termdine, termdine.menus[termdine.selectedMenu].buttons[termdine.selectedButton]); break; 
+				case 10: doButtonAction(&termdine, termdine.menus[termdine.selectedMenu].buttons[termdine.selectedButton]); break; 
 			}
 
 			if (c == 'q' || c == 27) 
@@ -134,24 +146,25 @@ int main(void)
 		}
 
 		/* logic */
-		while (termdine.selectedButton<0||termdine.selectedButton>menus[termdine.selectedMenu].buttonAmount-1)
+		while (termdine.selectedButton<0||termdine.selectedButton>termdine.menus[termdine.selectedMenu].buttonAmount-1)
 		{
 			if (termdine.selectedButton<0)
-				termdine.selectedButton += menus[termdine.selectedMenu].buttonAmount;
-			if (termdine.selectedButton>menus[termdine.selectedMenu].buttonAmount-1)
-				termdine.selectedButton -= menus[termdine.selectedMenu].buttonAmount;
+				termdine.selectedButton += termdine.menus[termdine.selectedMenu].buttonAmount;
+			if (termdine.selectedButton>termdine.menus[termdine.selectedMenu].buttonAmount-1)
+				termdine.selectedButton -= termdine.menus[termdine.selectedMenu].buttonAmount;
 		}
 
 		/* drawing */
-		mvprintw(0, 1, "%s", menus[termdine.selectedMenu].title);
-		mvwaddstr(textWin, 0, 0, menus[termdine.selectedMenu].text);
-		
-		for (int i=0;i<menus[termdine.selectedMenu].buttonAmount;i++)
+		for (int i=0;i<termdine.menus[termdine.selectedMenu].buttonAmount;i++)
 		{
 			
-			mvprintw(i+(strlen(menus[termdine.selectedMenu].text)/14)+1, 1, "%s%s", (termdine.selectedButton==i ? "> " : ""), menus[termdine.selectedMenu].buttons[i].name);
+			mvprintw(i+ceil((double)strlen(termdine.menus[termdine.selectedMenu].text)/MAXTITLESIZE)+3, 1, "%s%s", (termdine.selectedButton==i ? "> " : ""), termdine.menus[termdine.selectedMenu].buttons[i].name);
 
 		}
+
+		mvprintw(0, 1, "%s", termdine.menus[termdine.selectedMenu].title);
+		mvwprintw(textWin, 0, 0, "%s", termdine.menus[termdine.selectedMenu].text);
+		
 		box(mainWin, 0, 0);
 	}
 
@@ -186,13 +199,13 @@ Menu createMenuWithText(char* title, int buttonAmount, Button* buttons, char* te
 	return menu;
 }
 
-Button createButton(char* name, Action action, int actionInput)
+Button createButton(char* name, Action action, char* actionInput)
 {
 	Button button;
 
 	button.action = action;
-	button.actionInput = actionInput;
-
+	
+	memcpy(button.actionInput, actionInput, MAXTEXTSIZE+2);
 	memcpy(button.name, name, MAXNAMESIZE);
 
 	return button;
@@ -203,7 +216,9 @@ void doButtonAction(App* app, Button button)
 	switch(button.action)
 	{
 		case QUIT: app->running = FALSE; break;
-		case GOTOMENU: app->selectedMenu = button.actionInput; break;
+		case GOTOMENU: app->selectedButton = 0; app->selectedMenu = button.actionInput[0]-'0'; break;
+		case CHANGETEXT: changeText(&app->menus[button.actionInput[0]-'0'], button.actionInput+2, button.actionInput[1]-'0'+1); break;
+		case CHANGECURRENTTEXT: changeText(&app->menus[app->selectedMenu], button.actionInput+1, button.actionInput[1]-'0'+1); break;
 		case NOTHING: break;
 	}
 }
@@ -218,3 +233,13 @@ App initApp(void)
 
 	return app;
 }
+
+void changeText(Menu* menu, char* newText, int amount)
+{
+	memcpy(menu->text, newText, (amount>MAXTEXTSIZE?MAXTEXTSIZE:amount));
+}
+
+void addButton(Menu* menu, Button button, int index);
+void removeButton(Menu* menu, int index);
+
+

@@ -1,0 +1,10 @@
+{
+	"name": "Gulper",
+	"size":
+	{
+		"min": 30,
+		"avg": 35,
+		"max": 50
+	},
+	"description": "A Gulper is a type of fish that has a large mouth for eating in large quantities."
+}
