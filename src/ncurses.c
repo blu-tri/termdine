@@ -86,7 +86,7 @@ int main(void)
 	Button backButton = createButton("back", GOTOMENU, "0");
 	Button fishBackButton = createButton("back", GOTOMENU, "1");
 	Button sayHiButton = createButton("hello", CHANGECURRENTTEXT, "2Hi");
-		Button setToHelloButton = createButton("set text to Hello", CHANGETEXT, "35Hello");
+	Button setToHelloButton = createButton("set text to Hello", CHANGETEXT, "35Hello");
 	Button quitButton = createButton("quit", QUIT, "");
 
 
@@ -272,15 +272,11 @@ void addButton(Menu* menu, Button button, int index)
 {
 	menu->buttonAmount += 1;
 
-	Button* tempAlloc = realloc(menu->buttons, sizeof(Button) * menu->buttonAmount);
-	if (tempAlloc == NULL)
+	menu->buttons = realloc(menu->buttons, sizeof(Button) * menu->buttonAmount);
+	if (menu->buttons == NULL)
 	{
 		printf("failed to realloc space for menu %s\n", menu->title);
 		exit(1);
-	}
-	else
-	{
-		menu->buttons = tempAlloc;
 	}
 
 	for (int i=menu->buttonAmount-1;i>index-1;i--)
@@ -292,5 +288,3 @@ void addButton(Menu* menu, Button button, int index)
 }
 
 void removeButton(Menu* menu, int index);
-
-
