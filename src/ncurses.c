@@ -1,3 +1,9 @@
+/*
+ *
+ * This is a cool comment and a very pointless one idk why i added it
+ * 
+*/
+
 #include <math.h>
 #include <ncurses.h>
 #include <stdlib.h>
@@ -5,7 +11,7 @@
 
 #define MAXTEXTSIZE 100
 
-#define MAXMENUS 5
+#define MAXBUTTONS 50
 
 #define WIDTH 32
 #define HEIGHT 9
@@ -35,7 +41,7 @@ typedef struct menu
 	char title[MAXTITLESIZE];
 	char text[MAXTEXTSIZE];
 	int buttonAmount;
-	Button* buttons;
+	Button buttons[50];
 } Menu;
 
 typedef struct app
@@ -141,7 +147,8 @@ int main(void)
 				case 's': termdine.selectedButton += 1; break;
 				case 'e': doButtonAction(&termdine, termdine.menus[termdine.selectedMenu].buttons[termdine.selectedButton]); break; 
 				case 10: doButtonAction(&termdine, termdine.menus[termdine.selectedMenu].buttons[termdine.selectedButton]); break;
-				case 'z': addButton(&termdine.menus[termdine.selectedMenu], doNothingButton, termdine.menus[termdine.selectedMenu].buttonAmount-1);
+				case 'z': addButton(&termdine.menus[termdine.selectedMenu], doNothingButton, termdine.selectedButton); break;
+				case 'x': removeButton(&termdine.menus[termdine.selectedMenu], termdine.selectedButton); break;
 			}
 
 			if (c == 'q' || c == 27) 
@@ -173,11 +180,6 @@ int main(void)
 
 	endwin();
 
-	for (int i=0;i<menuAmount;i++)
-	{
-		free(menus[i].buttons);
-	}
-
 	return 0;
 }
 
@@ -186,13 +188,6 @@ Menu createMenu(char* title, int buttonAmount, Button* buttons)
 	Menu menu;
 
 	menu.buttonAmount = buttonAmount;
-	menu.buttons = malloc(sizeof(Button)*buttonAmount);
-	if (menu.buttons == NULL)
-	{
-		printf("failed to allocate memory while creating menu %s\n", title);
-		exit(1);
-	}
-
 	for (int i=0;i<buttonAmount;i++)
 	{
 		menu.buttons[i] = buttons[i];
@@ -209,14 +204,6 @@ Menu createMenuWithText(char* title, int buttonAmount, Button* buttons, char* te
 	Menu menu;
 
 	menu.buttonAmount = buttonAmount;
-
-	menu.buttons = malloc(sizeof(Button)*buttonAmount);
-	if (menu.buttons == NULL)
-	{
-		printf("failed to allocate memory while creating menu %s\n", title);
-		exit(1);
-	}
-
 	for (int i=0;i<buttonAmount;i++)
 	{
 		menu.buttons[i] = buttons[i];
@@ -270,16 +257,14 @@ void changeText(Menu* menu, char* newText, int amount)
 
 void addButton(Menu* menu, Button button, int index)
 {
-	menu->buttonAmount += 1;
-
-	menu->buttons = realloc(menu->buttons, sizeof(Button) * menu->buttonAmount);
-	if (menu->buttons == NULL)
+	if (menu->buttonAmount >= MAXBUTTONS)
 	{
-		printf("failed to realloc space for menu %s\n", menu->title);
-		exit(1);
+		return;
 	}
 
-	for (int i=menu->buttonAmount-1;i>index-1;i--)
+	menu->buttonAmount += 1;
+
+	for (int i=menu->buttonAmount;i>index-1;i--)
 	{
 		menu->buttons[i+1] = menu->buttons[i];
 	}
@@ -287,4 +272,17 @@ void addButton(Menu* menu, Button button, int index)
 	menu->buttons[index] = button;
 }
 
-void removeButton(Menu* menu, int index);
+void removeButton(Menu* menu, int index)
+{
+	if (menu->buttonAmount <= 1)
+	{
+		return;
+	}
+
+	for (int i=index+1;i<menu->buttonAmount;i++)
+	{
+		menu->buttons[i-1] = menu->buttons[i];
+	}
+
+	menu->buttonAmount -= 1;
+}
