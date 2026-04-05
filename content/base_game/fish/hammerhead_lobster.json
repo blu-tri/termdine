@@ -1,0 +1,10 @@
+{
+	"name": "Hammerhead Lobster",
+	"size":
+	{
+		"min": 10,
+		"avg": 33,
+		"max": 40
+	},
+	"description": "Hammerhead Lobsters have a very flexible and strong neck that allows them to swing their head to attack their prey."
+}

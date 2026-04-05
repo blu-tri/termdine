@@ -1,0 +1,10 @@
+{
+	"name": "Template Fish",
+	"size":
+	{
+		"min": 0,
+		"avg": 0,
+		"max": 0
+	},
+	"description": "This is a fish just meant for templating purposes. If you managed to catch this, wow!"
+}

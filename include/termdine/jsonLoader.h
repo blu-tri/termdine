@@ -3,10 +3,12 @@
 
 
 #include <cjson/cJSON.h>
+#include <dirent.h>
 
-#define MAXNAMESIZE   24 /*  */
+#define MAXNAMESIZE   24 /*  */ 
 #define MAXDESCSIZE  256 /*  */
 #define MAXFISHAMOUNT 20 /*  */
+#define MAXEXPANSIONS 30 /*  */
 
 /* type definitions */
 typedef struct fish 
@@ -26,6 +28,12 @@ typedef struct location
 	char description[MAXDESCSIZE];
 } Location;
 
+typedef struct directory
+{
+	char childrenNames[MAXEXPANSIONS][MAXDESCSIZE];
+	int childrenAmount;
+} Directory;
+
 /* function definitions */
 int hasStringValue(cJSON* object);
 int hasIntValue(cJSON* object);
@@ -34,5 +42,6 @@ int getIntValue(cJSON* object, int ifNone);
 char* convertToFilename(char* name);
 Fish loadFish(char* fishName);
 Location loadLocation(char* locationName);
+Directory loadDirectory(char* path);
 
 #endif

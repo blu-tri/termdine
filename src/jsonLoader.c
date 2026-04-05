@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <cjson/cJSON.h>
 #include <stdlib.h>
+#include <dirent.h>
 #include "../include/termdine/log.h"
 #include "../include/termdine/jsonLoader.h"
 
@@ -177,4 +178,30 @@ char* convertToFilename(char* name)
 	}
 
 	return filename;
+}
+
+Directory loadDirectory(char* path)
+{
+	Directory directory;
+
+	DIR* dir = opendir(path);
+	if (dir == NULL)
+	{
+		prError("Couldn't open directory does the following directory actually exist?\n");
+		prError(path);
+		printf("\n");
+		exit(1);
+	}
+
+	struct dirent* directorent;
+	int i = 0;
+	while ((directorent = readdir(dir)) != NULL)
+	{
+		memcpy(directory.childrenNames[i], directorent->d_name, MAXDESCSIZE);
+
+		i++;
+	}
+
+	directory.childrenAmount = i;
+	return directory;
 }

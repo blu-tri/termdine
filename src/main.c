@@ -5,23 +5,15 @@
 #include "../include/termdine/log.h"
 
 /* main function (crazy right?) */
-int main(int argc, char* argv[])
+int main(void)
 {
-	/* checking if program got input */
-	if (argc < 2)
-	{
-		prError("Not enough arguments! You should run this command as jsonLoader <locationname>.\n");
-		return 1;
-	}
-	Location locationPlace = loadLocation(argv[1]);
+	Directory expansions = loadDirectory("content");
 
-	printf("location: %s\n%s\nfish:\n", locationPlace.name, locationPlace.description);
-	for (int i=0;i<locationPlace.fishAmount;i++)
+	for (int i=0;i<expansions.childrenAmount;i++)
 	{
-		Fish fish = loadFish(locationPlace.fish[i]);
-
-		printf("%s\nsize:\n  min: %d\n  avg: %d\n  max: %d\n%s\n", fish.name, fish.minSize, fish.avgSize, fish.maxSize, fish.description);
+		printf("%s\n", expansions.childrenNames[i]);
 	}
+	
 
 	return 0;
 }
