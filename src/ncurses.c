@@ -12,6 +12,7 @@
 #define MAXTEXTSIZE 100
 
 #define MAXBUTTONS 50
+#define MAXTOGGLES 100
 
 #define WIDTH 32
 #define HEIGHT 9
@@ -26,6 +27,7 @@ typedef enum action
 	GOTOMENU,
 	CHANGETEXT,
 	CHANGECURRENTTEXT,
+	TOGGLE,
 	NOTHING,
 } Action;
 
@@ -50,6 +52,8 @@ typedef struct app
 	int selectedMenu;
 	int selectedButton;
 	Menu* menus;
+	char toggles[MAXTOGGLES][MAXTEXTSIZE];
+	int togglesAmount;
 } App;
 
 /* function definitions */
@@ -61,6 +65,7 @@ App initApp(void);
 void changeText(Menu* menu, char* newText, int amount);
 void addButton(Menu* menu, Button button, int index);
 void removeButton(Menu* menu, int index);
+void doToggle(App* app, char* actionInput);
 
 WINDOW* mainWin;
 WINDOW* textWin;
@@ -94,6 +99,7 @@ int main(void)
 	Button sayHiButton = createButton("hello", CHANGECURRENTTEXT, "2Hi");
 	Button setToHelloButton = createButton("set text to Hello", CHANGETEXT, "35Hello");
 	Button quitButton = createButton("quit", QUIT, "");
+	Button testToggleButton = createButton("toggle", TOGGLE, "");
 
 
 	Button mainMenuButtons[3];
@@ -236,6 +242,7 @@ void doButtonAction(App* app, Button button)
 		case CHANGETEXT: changeText(&app->menus[button.actionInput[0]-'0'], button.actionInput+2, button.actionInput[1]-'0'+1); break;
 		case CHANGECURRENTTEXT: changeText(&app->menus[app->selectedMenu], button.actionInput+1, button.actionInput[1]-'0'+1); break;
 		case NOTHING: break;
+		case TOGGLE: doToggle(app, button.actionInput);
 	}
 }
 
@@ -285,4 +292,15 @@ void removeButton(Menu* menu, int index)
 	}
 
 	menu->buttonAmount -= 1;
+}
+
+void doToggle(App* app, char* actionInput)
+{
+	for (int i=0;i<app->togglesAmount;i++)
+	{
+		if (strcmp(app->toggles[i], actionInput))
+		{
+				
+		}
+	}
 }

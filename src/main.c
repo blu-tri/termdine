@@ -7,7 +7,7 @@
 /* main function (crazy right?) */
 int main(void)
 {
-	Directory expansions = loadDirectory("content");
+	Directory expansions = loadDirectory("expansions");
 
 	for (int i=0;i<expansions.childrenAmount;i++)
 	{
