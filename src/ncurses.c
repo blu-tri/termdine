@@ -111,10 +111,11 @@ int main(void)
 	fishButtons[0] = textButton;
 	fishButtons[1] = backButton;
 
-	Button settingsButtons[3];
+	Button settingsButtons[4];
 	settingsButtons[0] = doNothingButton;
 	settingsButtons[1] = setToHelloButton;
-	settingsButtons[2] = backButton;
+	settingsButtons[2] = testToggleButton;
+	settingsButtons[3] = backButton;
 
 	Button textButtons[2];
 	textButtons[0] = sayHiButton;
@@ -300,7 +301,18 @@ void doToggle(App* app, char* actionInput)
 	{
 		if (strcmp(app->toggles[i], actionInput))
 		{
-				
+				for (int j=i+1;j<app->togglesAmount;j++)
+				{
+					memcpy(app->toggles[j-1], app->toggles[j], MAXTEXTSIZE);
+				}
+
+				app->togglesAmount -= 1;
 		}
+		else
+		{
+			memcpy(app->toggles[app->togglesAmount], actionInput, MAXTEXTSIZE);
+			app->togglesAmount += 1;
+		}
+
 	}
 }
