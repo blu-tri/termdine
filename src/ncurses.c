@@ -122,7 +122,7 @@ int main(void)
 	textButtons[1] = fishBackButton;
 
 	Menu mainMenu = createMenu("Termdine", 3, mainMenuButtons);
-	Menu settingsMenu = createMenu("Settings", 3, settingsButtons);
+	Menu settingsMenu = createMenu("Settings", 4, settingsButtons);
 	Menu fishMenu = createMenu("Fish", 2, fishButtons);
 	Menu textMenu = createMenuWithText("Text", 2, textButtons, "this is a test to see how well this works");
 
