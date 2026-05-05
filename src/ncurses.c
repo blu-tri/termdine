@@ -6,7 +6,6 @@
 
 #include <math.h>
 #include <ncurses.h>
-#include <stdlib.h>
 #include <string.h>
 
 #define MAXTEXTSIZE 100
@@ -18,7 +17,7 @@
 #define HEIGHT 9
 
 #define MAXTITLESIZE WIDTH-2
-#define MAXNAMESIZE  WIDTH-4
+#define MAXNAMESIZE  WIDTH-8 // 2 for sides, 2 for selector thing, 8 for toggle thing
 
 /* type definitions */
 typedef enum action
@@ -66,6 +65,7 @@ void changeText(Menu* menu, char* newText, int amount);
 void addButton(Menu* menu, Button button, int index);
 void removeButton(Menu* menu, int index);
 void doToggle(App* app, char* actionInput);
+bool toggled(App app, char* toggle);
 
 WINDOW* mainWin;
 WINDOW* textWin;
@@ -175,8 +175,15 @@ int main(void)
 		for (int i=0;i<termdine.menus[termdine.selectedMenu].buttonAmount;i++)
 		{
 			
-			mvprintw(i+ceil((double)strlen(termdine.menus[termdine.selectedMenu].text)/MAXTITLESIZE)+3, 1, "%s%s", (termdine.selectedButton==i ? "> " : ""), termdine.menus[termdine.selectedMenu].buttons[i].name);
 
+			if (termdine.menus[termdine.selectedMenu].buttons[i].action != TOGGLE)
+			{
+				mvprintw(i+ceil((double)strlen(termdine.menus[termdine.selectedMenu].text)/MAXTITLESIZE)+3, 1, "%s%s", (termdine.selectedButton==i ? "> " : ""), termdine.menus[termdine.selectedMenu].buttons[i].name);
+			}
+			else if (termdine.menus[termdine.selectedMenu].buttons[i].action == TOGGLE)
+			{
+				mvprintw(i+ceil((double)strlen(termdine.menus[termdine.selectedMenu].text)/MAXTITLESIZE)+3, 1, "%s[%c] %s", (termdine.selectedButton==i ? "> " : ""), (toggled(termdine, termdine.menus[termdine.selectedMenu].buttons[i].actionInput)) ? '*' : ' ', termdine.menus[termdine.selectedMenu].buttons[i].name);
+			}
 		}
 
 		mvprintw(0, 1, "%s", termdine.menus[termdine.selectedMenu].title);
@@ -315,4 +322,17 @@ void doToggle(App* app, char* actionInput)
 		}
 
 	}
+}
+
+bool toggled(App app, char* toggle)
+{
+	for (int i=0;i<app.togglesAmount;i++)
+	{
+		if (strcmp(app.toggles[i], toggle))
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
