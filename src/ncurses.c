@@ -1,6 +1,7 @@
 /*
  *
- * This is a cool comment and a very pointless one idk why i added it
+ * This is a cool and a very pointless comment
+ * idk why i added it
  * 
 */
 
@@ -34,7 +35,7 @@ typedef struct button
 {
 	char name[MAXNAMESIZE];
 	Action action;
-	char actionInput[MAXTEXTSIZE+2];
+	char actionInput[MAXTEXTSIZE+3];
 } Button;
 
 typedef struct menu 
@@ -56,16 +57,16 @@ typedef struct app
 } App;
 
 /* function definitions */
-Menu createMenu(char* title, int buttonAmount, Button* buttons);
-Menu createMenuWithText(char* title, int buttonAmount, Button* buttons, char* text);
+Menu   createMenu(char* title, int buttonAmount, Button* buttons);
+Menu   createMenuWithText(char* title, int buttonAmount, Button* buttons, char* text);
 Button createButton(char* name, Action action, char* actionInput);
-void doButtonAction(App* app, Button button);
-App initApp(void);
-void changeText(Menu* menu, char* newText, int amount);
-void addButton(Menu* menu, Button button, int index);
-void removeButton(Menu* menu, int index);
-void doToggle(App* app, char* actionInput);
-bool toggled(App app, char* toggle);
+void   doButtonAction(App* app, Button button);
+App    initApp(void);
+void   changeText(Menu* menu, char* newText, int amount);
+void   addButton(Menu* menu, Button button, int index);
+void   removeButton(Menu* menu, int index);
+void   doToggle(App* app, char* actionInput);
+int    toggled(App app, char* toggle);
 
 WINDOW* mainWin;
 WINDOW* textWin;
@@ -97,9 +98,9 @@ int main(void)
 	Button backButton = createButton("back", GOTOMENU, "0");
 	Button fishBackButton = createButton("back", GOTOMENU, "1");
 	Button sayHiButton = createButton("hello", CHANGECURRENTTEXT, "2Hi");
-	Button setToHelloButton = createButton("set text to Hello", CHANGETEXT, "35Hello");
+	Button setToHelloButton = createButton("set text to Hello", CHANGETEXT, "305Hello");
 	Button quitButton = createButton("quit", QUIT, "");
-	Button testToggleButton = createButton("toggle", TOGGLE, "toggle");
+	Button testToggleButton = createButton("toggle main menu text", TOGGLE, "toggle");
 
 
 	Button mainMenuButtons[3];
@@ -153,7 +154,7 @@ int main(void)
 				case 'w': termdine.selectedButton -= 1; break;
 				case 's': termdine.selectedButton += 1; break;
 				case 'e': doButtonAction(&termdine, termdine.menus[termdine.selectedMenu].buttons[termdine.selectedButton]); break; 
-				case 10: doButtonAction(&termdine, termdine.menus[termdine.selectedMenu].buttons[termdine.selectedButton]); break;
+				case  10: doButtonAction(&termdine, termdine.menus[termdine.selectedMenu].buttons[termdine.selectedButton]); break;
 				case 'z': addButton(&termdine.menus[termdine.selectedMenu], doNothingButton, termdine.selectedButton); break;
 				case 'x': removeButton(&termdine.menus[termdine.selectedMenu], termdine.selectedButton); break;
 			}
@@ -171,6 +172,15 @@ int main(void)
 				termdine.selectedButton -= termdine.menus[termdine.selectedMenu].buttonAmount;
 		}
 
+		if (toggled(termdine, "toggle"))
+		{
+			changeText(&termdine.menus[0], "The fishing game", 17);
+		}
+		else
+		{
+			changeText(&termdine.menus[0], "", 1);
+		}
+
 		/* drawing */
 		for (int i=0;i<termdine.menus[termdine.selectedMenu].buttonAmount;i++)
 		{
@@ -182,7 +192,7 @@ int main(void)
 			}
 			else if (termdine.menus[termdine.selectedMenu].buttons[i].action == TOGGLE)
 			{
-				mvprintw(i+ceil((double)strlen(termdine.menus[termdine.selectedMenu].text)/MAXTITLESIZE)+3, 1, "%s[%c] %s", (termdine.selectedButton==i ? "> " : ""), (toggled(termdine, termdine.menus[termdine.selectedMenu].buttons[i].actionInput)) ? '*' : ' ', termdine.menus[termdine.selectedMenu].buttons[i].name);
+				mvprintw(i+ceil((double)strlen(termdine.menus[termdine.selectedMenu].text)/MAXTITLESIZE)+3, 1, "%s[%c] %s", (termdine.selectedButton==i ? "> " : ""), ((toggled(termdine, termdine.menus[termdine.selectedMenu].buttons[i].actionInput)) ? '*' : ' '), termdine.menus[termdine.selectedMenu].buttons[i].name);
 			}
 		}
 
@@ -247,7 +257,7 @@ void doButtonAction(App* app, Button button)
 	{
 		case QUIT: app->running = FALSE; break;
 		case GOTOMENU: app->selectedButton = 0; app->selectedMenu = button.actionInput[0]-'0'; break;
-		case CHANGETEXT: changeText(&app->menus[button.actionInput[0]-'0'], button.actionInput+2, button.actionInput[1]-'0'+1); break;
+		case CHANGETEXT: changeText(&app->menus[button.actionInput[0]-'0'], button.actionInput+3, (button.actionInput[1]-'0')*10+button.actionInput[2]-'0'+1); break;
 		case CHANGECURRENTTEXT: changeText(&app->menus[app->selectedMenu], button.actionInput+1, button.actionInput[1]-'0'+1); break;
 		case NOTHING: break;
 		case TOGGLE: doToggle(app, button.actionInput);
@@ -261,6 +271,8 @@ App initApp(void)
 	app.running = TRUE;
 	app.selectedMenu = 0;
 	app.selectedButton = 0;
+	app.togglesAmount = 1;
+	memcpy(app.toggles[0], "running", MAXTEXTSIZE);
 
 	return app;
 }
@@ -306,7 +318,7 @@ void doToggle(App* app, char* actionInput)
 {
 	for (int i=0;i<app->togglesAmount;i++)
 	{
-		if (strcmp(app->toggles[i], actionInput))
+		if (strcmp(actionInput, app->toggles[i])==0)
 		{
 				for (int j=i+1;j<app->togglesAmount;j++)
 				{
@@ -314,25 +326,24 @@ void doToggle(App* app, char* actionInput)
 				}
 
 				app->togglesAmount -= 1;
+				return;
 		}
-		else
-		{
-			memcpy(app->toggles[app->togglesAmount], actionInput, MAXTEXTSIZE);
-			app->togglesAmount += 1;
-		}
-
 	}
+	
+	memcpy(app->toggles[app->togglesAmount], actionInput, MAXTEXTSIZE);
+	app->togglesAmount += 1;
+	return;
 }
 
-bool toggled(App app, char* toggle)
+int toggled(App app, char* toggle)
 {
 	for (int i=0;i<app.togglesAmount;i++)
 	{
-		if (strcmp(app.toggles[i], toggle))
+		if (strcmp(app.toggles[i], toggle)==0)
 		{
-			return true;
+			return 1;
 		}
 	}
 
-	return false;
+	return 0;
 }
