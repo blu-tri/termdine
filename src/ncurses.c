@@ -99,7 +99,7 @@ int main(void)
 	Button sayHiButton = createButton("hello", CHANGECURRENTTEXT, "2Hi");
 	Button setToHelloButton = createButton("set text to Hello", CHANGETEXT, "35Hello");
 	Button quitButton = createButton("quit", QUIT, "");
-	Button testToggleButton = createButton("toggle", TOGGLE, "");
+	Button testToggleButton = createButton("toggle", TOGGLE, "toggle");
 
 
 	Button mainMenuButtons[3];
