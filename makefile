@@ -1,9 +1,9 @@
 CFLAGS := -Wall -Werror -Wextra -pedantic -std=c99 -g
 
-all: jsonLoader log termdine
+all: log jsonLoader tuidine termdine
 
 termdine: src/main.c
-	clang src/main.c src/jsonLoader.c -o termdine  -lcjson -Llib -ljsonLoader -llog -lncurses $(CFLAGS)
+	clang src/main.c src/jsonLoader.c -o termdine -lcjson -lncurses -lm -Llib -ljsonLoader -llog -ltuidine $(CFLAGS)
 
 jsonLoader: src/jsonLoader.c include/termdine/jsonLoader.h
 	clang -c src/jsonLoader.c -o lib/jsonLoader.o $(CFLAGS)
@@ -16,9 +16,10 @@ log: src/log.c include/termdine/log.h
 math: src/math.c
 	clang src/math.c -o math -lm $(CFLAGS)
 
-ncurses: src/ncurses.c 
-	clang src/ncurses.c -o ncurses -lncurses -lm $(CFLAGS)
+tuidine: src/tuidine.c include/termdine/tuidine.h 
+	clang -c src/tuidine.c -o lib/tuidine.o $(CFLAGS)
+	ar rcs lib/libtuidine.a lib/tuidine.o
 
 clean:
-	rm -rf termdine math ncurses lib/*
+	rm -rf termdine math lib/*
 
